@@ -1,6 +1,7 @@
 package com.apengjers.garbageclassification
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -24,6 +25,8 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
+import android.widget.ProgressBar
+import android.content.res.ColorStateList
 
 data class GarbageInfo(
     val label: String,
@@ -34,9 +37,13 @@ data class GarbageInfo(
 class MainActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
-    private lateinit var tvResult: TextView
+    private lateinit var tvLabel: TextView
+    private lateinit var tvConfidence: TextView
+    private lateinit var tvCategory: TextView
+    private lateinit var tvDescription: TextView
     private lateinit var btnCamera: Button
     private lateinit var btnGallery: Button
+    private lateinit var progressConfidence: ProgressBar
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -83,7 +90,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         imageView = findViewById(R.id.imageView)
-        tvResult = findViewById(R.id.tvResult)
+        tvLabel = findViewById(R.id.tvLabel)
+        tvConfidence = findViewById(R.id.tvConfidence)
+        progressConfidence = findViewById(R.id.progressConfidence)
+        tvCategory = findViewById(R.id.tvCategory)
+        tvDescription = findViewById(R.id.tvDescription)
         btnCamera = findViewById(R.id.btnCamera)
         btnGallery = findViewById(R.id.btnGallery)
 
@@ -148,21 +159,52 @@ class MainActivity : AppCompatActivity() {
 
             if (maxIndex in garbageList.indices) {
                 val info = garbageList[maxIndex]
-                val resultText = StringBuilder()
-                resultText.append("${info.label} (${"%.1f".format(maxScore * 100)}%)\n")
-                resultText.append("Kategori: ${info.category}\n\n")
-                resultText.append(info.description)
-                
-                tvResult.text = resultText.toString()
+                val confidence = (maxScore * 100).toInt()
+
+                val labelRes = when {
+                    confidence >= 80 -> info.label.uppercase()
+                    confidence >= 60 -> "Mungkin ${info.label.uppercase()}"
+                    confidence >= 40 -> "Kemungkinan ${info.label.uppercase()}"
+                    else -> "Tidak Yakin"
+                }
+                val colorRes = when {
+                    confidence >= 80 -> R.color.confidence_green
+                    confidence >= 60 -> R.color.confidence_yellow
+                    else -> R.color.confidence_red
+                }
+                val color = ContextCompat.getColor(this, colorRes)
+
+                tvLabel.text = labelRes
+                progressConfidence.progress = confidence
+                tvConfidence.setTextColor(color)
+                progressConfidence.progressTintList = ColorStateList.valueOf(color)
+
+                if (confidence >= 40){
+                    tvConfidence.text = "${confidence}%"
+                    tvCategory.text = "Kategori: ${info.category}"
+                    tvDescription.text = info.description
+                } else {
+                    tvConfidence.text = "-"
+                    tvCategory.text = ""
+                    tvDescription.text =
+                        "Ambil foto kembali untuk mendapatkan hasil lebih akurat"
+                }
+
             } else {
-                tvResult.text = "Tidak dapat mengenali objek (Index: $maxIndex)"
+                tvLabel.text = "Tidak Dikenali"
+                tvConfidence.text = "-"
+                tvCategory.text = "-"
+                tvDescription.text = "Objek tidak dapat dikenali (Index: $maxIndex)"
             }
 
             // Releases model resources if no longer used.
             model.close()
         } catch (e: Exception) {
             Log.e("MainActivity", "Classification failed", e)
-            tvResult.text = "Error: ${e.message}"
+            tvLabel.text = "Error"
+            tvConfidence.text = "-"
+            tvCategory.text = "-"
+            tvDescription.text = e.message ?: "Terjadi kesalahan"
         }
     }
 }
