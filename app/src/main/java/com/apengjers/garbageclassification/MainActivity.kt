@@ -119,6 +119,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getConfidenceColor(confidence:Int): Int{
+        return when {
+            confidence >= 80 -> R.color.confidence_green
+            confidence >= 60 -> R.color.confidence_yellow
+            else -> R.color.confidence_red
+        }
+    }
+
+    private fun getLabelText(confidence: Int, label: String): String{
+        val formattedLabel = label.replaceFirstChar { it.uppercase() }
+        return when {
+            confidence >= 80 -> formattedLabel
+            confidence >= 60 -> "Mungkin ${formattedLabel}"
+            confidence >= 40 -> "Kemungkinan ${formattedLabel}"
+            else -> "Tidak Yakin"
+        }
+    }
+
     private fun classifyImage(bitmap: Bitmap) {
         try {
             val model = FixedModel.newInstance(this)
@@ -157,24 +175,15 @@ class MainActivity : AppCompatActivity() {
                 GarbageInfo("Sepatu", "Anorganik", "Terdiri dari material campuran. Bisa didaur ulang atau diperbaiki jika masih layak.")
             )
 
+
             if (maxIndex in garbageList.indices) {
                 val info = garbageList[maxIndex]
                 val confidence = (maxScore * 100).toInt()
-
-                val labelRes = when {
-                    confidence >= 80 -> info.label.uppercase()
-                    confidence >= 60 -> "Mungkin ${info.label.uppercase()}"
-                    confidence >= 40 -> "Kemungkinan ${info.label.uppercase()}"
-                    else -> "Tidak Yakin"
-                }
-                val colorRes = when {
-                    confidence >= 80 -> R.color.confidence_green
-                    confidence >= 60 -> R.color.confidence_yellow
-                    else -> R.color.confidence_red
-                }
+                val labelText = getLabelText(confidence, info.label)
+                val colorRes = getConfidenceColor(confidence)
                 val color = ContextCompat.getColor(this, colorRes)
 
-                tvLabel.text = labelRes
+                tvLabel.text = labelText
                 progressConfidence.progress = confidence
                 tvConfidence.setTextColor(color)
                 progressConfidence.progressTintList = ColorStateList.valueOf(color)
