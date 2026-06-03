@@ -27,6 +27,7 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import android.widget.ProgressBar
 import android.content.res.ColorStateList
+import android.content.Intent
 
 data class GarbageInfo(
     val label: String,
@@ -97,6 +98,7 @@ class MainActivity : AppCompatActivity() {
         tvDescription = findViewById(R.id.tvDescription)
         btnCamera = findViewById(R.id.btnCamera)
         btnGallery = findViewById(R.id.btnGallery)
+        val btnTPS: Button = findViewById(R.id.btnTPS)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -116,6 +118,11 @@ class MainActivity : AppCompatActivity() {
 
         btnGallery.setOnClickListener {
             pickImage.launch("image/*")
+        }
+
+        btnTPS.setOnClickListener {
+            val intent = Intent(this, TPSActivity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -216,4 +223,5 @@ class MainActivity : AppCompatActivity() {
             tvDescription.text = e.message ?: "Terjadi kesalahan"
         }
     }
+
 }

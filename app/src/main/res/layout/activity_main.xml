@@ -57,7 +57,7 @@
         app:layout_constraintTop_toBottomOf="@id/imageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btnMaps">
+        app:layout_constraintBottom_toTopOf="@id/btnCamera">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -145,6 +145,19 @@
         app:layout_constraintEnd_toStartOf="@+id/btnGallery"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnTPS"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
+        android:text="📍 TPS Jabodetabek"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/btnCamera"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/btnCamera"
+        app:layout_constraintEnd_toEndOf="@id/btnGallery" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
