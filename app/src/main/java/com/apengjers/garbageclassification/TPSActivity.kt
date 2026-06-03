@@ -25,8 +25,10 @@ class TPSActivity: AppCompatActivity() {
         setContentView(R.layout.activity_tps)
 
         setupMaps(R.id.cardBantargebang, "TPST Bantar Gebang")
-        setupMaps(R.id.cardCipayung, "TPS Cipayung Depok")
+        setupMaps(R.id.cardCipayung, "TPA Cipayung")
         setupMaps(R.id.cardRawaKucing, "TPS Rawakucing Tangerang")
+        setupMaps(R.id.cardSumurBatu, "TPA Sumur Batu")
+        setupMaps(R.id.cardGaluga, "TPA Galuga")
     }
 
 }
